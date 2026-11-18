@@ -1115,13 +1115,33 @@ WBTor({
     const w = await f.createWritable(); await w.write(inhalt); await w.close();
   }
   /* Ordner samt Gerüst anlegen; vorhandene Dateien bleiben unberührt (außer auftrag.json). */
+  /* Vorhandenen Auftragsordner zur Issue-ID suchen: „<ID>“ oder „<ID>_…“ (auch umbenannt/von Hand angelegt).
+     Ergebnis: Name | '' (keiner da) | null (kein Zugriff auf die Wurzel) */
+  async function finde(iid, fragen){
+    const w = await wurzel(fragen); if (!w) return null;
+    const id = String(iid).replace(/[\\/:*?"<>|]+/g, ''), treffer = [];
+    for await (const [n, h] of w.entries()) if (h.kind === 'directory' && (n === id || n.startsWith(id + '_'))) treffer.push(n);
+    treffer.sort(); return treffer[0] || '';
+  }
+  /* Gibt es den gespeicherten Ordner noch? Fragt nicht nach Rechten.
+     { stand:'ok'|'umbenannt'|'fehlt'|'unbekannt', name } */
+  async function pruefen(iid, name){
+    try {
+      const w = await wurzel(false); if (!w) return { stand:'unbekannt', name };
+      if (name) { try { await w.getDirectoryHandle(name, { create:false }); return { stand:'ok', name }; } catch (e) { if (e && e.name !== 'NotFoundError' && e.name !== 'TypeMismatchError') throw e; } }
+      const da = await finde(iid, false);
+      return da ? { stand:'umbenannt', name:da } : { stand:'fehlt', name };
+    } catch (e) { return { stand:'unbekannt', name }; }
+  }
   async function anlegen(iid, titel, steckbrief){
-    const name = ordnerName(iid, titel);
+    /* vorhandenen Ordner zur ID weiterverwenden statt einen zweiten anzulegen */
+    let da = ''; try { da = await finde(iid, true); } catch (e) {}
+    const name = da || ordnerName(iid, titel);
     const dir = await auftragsordner(name, true, true);
     if (!dir) throw new Error(kann ? 'Kein Zugriff auf die Ablage – erst die Wurzel wählen.' : 'Dieser Browser kann keine Ordner anlegen.');
     for (const u of UNTER) await dir.getDirectoryHandle(u, { create:true });
     await schreibenIn(dir, '00_Auftrag/auftrag.json', JSON.stringify(steckbrief || { id:iid, titel }, null, 2));
-    return { name, link:linkFuer(name), angelegt:new Date().toISOString().slice(0, 10) };
+    return { name, link:linkFuer(name), angelegt:new Date().toISOString().slice(0, 10), vorhanden:!!da };
   }
   /* Datei in den Unterordner des Auftrags legen. true = abgelegt, false = nicht möglich. */
   async function ablegen(ordner, unter, dateiname, inhalt){
@@ -1178,7 +1198,7 @@ WBTor({
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
     return 'download';
   }
-  window.WBAblage = { UNTER, kann, cfg, cfgSetzen, ordnerName, linkFuer, wurzelWaehlen, wurzel, anlegen, ablegen, geruestZip, aktiv, aktivSetzen, ordnerVon, sichern };
+  window.WBAblage = { UNTER, kann, cfg, cfgSetzen, ordnerName, linkFuer, wurzelWaehlen, wurzel, finde, pruefen, anlegen, ablegen, geruestZip, aktiv, aktivSetzen, ordnerVon, sichern };
 })();
 
 </script>
