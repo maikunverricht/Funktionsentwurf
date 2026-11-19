@@ -16,6 +16,9 @@
 /* Design-Check 19.11.2026: Klickziele mindestens 24 px */
 button,[role="button"],select{min-height:24px}
 button{min-width:24px}
+
+/* Design-Check 19.11.2026: Akzentfarben als Text im hellen Modus dunkler */
+html[data-theme="light"]{--amber-text:#8A5A00;--teal-text:#0F6E5E}
 </style>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Funktionsentwurf · Kontor</title>
@@ -142,8 +145,8 @@ body{overflow:auto;overflow-x:hidden}
 .fn-liste button.an{background:color-mix(in srgb,var(--amber) 14%,transparent);color:var(--text)}
 .fn-liste button span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mk{flex:none;font:600 12px/1 var(--mono);padding:3px 6px;border-radius:100px;border:1px solid var(--line)}
-.mk.ge{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 45%,transparent)}
-.mk.neu{color:var(--teal);border-color:color-mix(in srgb,var(--teal) 45%,transparent)}
+.mk.ge{color:var(--amber-text,var(--amber));border-color:color-mix(in srgb,var(--amber) 45%,transparent)}
+.mk.neu{color:var(--teal-text,var(--teal));border-color:color-mix(in srgb,var(--teal) 45%,transparent)}
 .mk.ent{color:var(--rot);border-color:color-mix(in srgb,var(--rot) 45%,transparent)}
 .arbeit{min-width:0;padding:14px 16px 18px;border-radius:18px;border:1px solid var(--line);background:var(--glass);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .kopf{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
@@ -173,7 +176,7 @@ textarea.code:focus{outline:none;border-color:var(--line-hi)}
 .code.diff{min-height:0;max-height:50vh}
 .diff span{display:block;min-height:1.6em}
 #main code,#main pre,#main textarea,#main svg text,.fn-liste,.kopf h2{font-variant-ligatures:none;font-feature-settings:"calt" 0,"liga" 0}
-.diff .p{background:var(--teal-weak);color:var(--teal);display:block}
+.diff .p{background:var(--teal-weak);color:var(--teal-text,var(--teal));display:block}
 .diff .m{background:var(--rot-weak);color:var(--rot);display:block}
 .diff .h{color:var(--text-3);display:block}
 .fehler{color:var(--rot);font-size:12.5px;margin-top:6px;min-height:1em}
@@ -182,7 +185,7 @@ table.pruef{width:100%;border-collapse:collapse;font-size:12.5px}
 table.pruef th{text-align:left;font:600 11px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);padding:6px 8px;border-bottom:1px solid var(--line)}
 table.pruef td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
 table.pruef td.n{font-family:var(--mono)}
-.ok{color:var(--teal)}.fehlt{color:var(--rot)}
+.ok{color:var(--teal-text,var(--teal))}.fehlt{color:var(--rot)}
 .pv-roh{margin-top:12px}
 .pv-roh summary{cursor:pointer;font-size:13px;color:var(--text-2)}
 .pv-roh textarea{margin-top:8px}
@@ -214,7 +217,7 @@ table.pruef td.n{font-family:var(--mono)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 .stand.auftrag{margin-top:-4px;color:var(--text-2)}
-.stand.auftrag b{color:var(--teal)}
+.stand.auftrag b{color:var(--teal-text,var(--teal))}
 .stand.auftrag .mono{font-family:var(--mono);font-size:12px}
 
 </style>
